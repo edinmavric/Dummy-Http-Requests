@@ -14,6 +14,7 @@ function sendHttpRequest(method, url, data) {
   //   if (xhr.status >= 200 && xhr.status < 300) {
   //     resolve(xhr.response);
   //   } else {
+  //     xhr.response
   //     reject(new Error("Something went wrong!"));
   //   }
   //   resolve(xhr.response);
@@ -32,9 +33,21 @@ function sendHttpRequest(method, url, data) {
     headers: {
       "Content-Type": "application/json",
     },
-  }).then((response) => {
-    return response.json();
-  });
+  })
+    .then((response) => {
+      if (response.status >= 200 && response.status < 300) {
+        return response.json();
+      } else {
+        return response.json().then((errData) => {
+          console.log(errData);
+          throw new Error("Something went wrong - server-side.");
+        });
+      }
+    })
+    .catch((error) => {
+      console.log(error);
+      throw new Error("Something went wrong!");
+    });
 }
 
 async function fetchPosts() {
